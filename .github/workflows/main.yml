@@ -42,7 +42,7 @@ jobs:
             nvm install 22.9.0
             sudo apt-get -y update
             sudo apt-get -y install nginx
-            cd /home
+            cd home
             sudo rm -rf /var/www/*
             sudo mv -f * /var/www
             cd /var/www/
