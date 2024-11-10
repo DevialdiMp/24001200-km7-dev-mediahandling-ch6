@@ -59,4 +59,3 @@ jobs:
             sudo ufw allow 'Nginx HTTP'
             sudo systemctl start nginx
             sudo systemctl enable nginx
-            pm2 reload all --update-env	
