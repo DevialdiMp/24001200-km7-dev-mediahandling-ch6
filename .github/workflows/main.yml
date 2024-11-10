@@ -13,7 +13,6 @@ jobs:
     steps:
       - name: ngecek repository
         uses: actions/checkout@v2
-
       - name: Deploy to Cloud 1
         uses: easingthemes/ssh-deploy@main
         env:
@@ -56,8 +55,8 @@ jobs:
             npx prisma migrate deploy
             pm2 init simple
             pm2 start
-            pm2 startup systemd
-            pm2 save
             sudo ufw allow 'Nginx HTTP'
             sudo systemctl start nginx
             sudo systemctl enable nginx
+
+bagaimana ketika ci/cd dijalan kan otomatis pada github maka apayang kita ubah otomatis berubah pada aws tanpa perlu pm2 reload di powershell
