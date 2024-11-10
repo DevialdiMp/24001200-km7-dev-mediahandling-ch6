@@ -6,7 +6,7 @@ const userRoutes = require("./routes/userRoutes")
 const imageRoutes = require("./routes/imageRoutes")
 
 app.use(express.json())
-app.use("/user", userRoutes)
+app.use("/pengguna", userRoutes)
 app.use("/image", imageRoutes)
 
 app.listen(PORT, () => {
