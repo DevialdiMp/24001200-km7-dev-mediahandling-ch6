@@ -58,5 +58,3 @@ jobs:
             sudo ufw allow 'Nginx HTTP'
             sudo systemctl start nginx
             sudo systemctl enable nginx
-
-bagaimana ketika ci/cd dijalan kan otomatis pada github maka apayang kita ubah otomatis berubah pada aws tanpa perlu pm2 reload di powershell
