@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Deploy to Cloud
         uses: easingthemes/ssh-deploy@main
@@ -23,7 +23,7 @@ jobs:
           TARGET: ${{ secrets.TARGET_DIR }}
 
       - name: Install Node.js 22.9.0 and deploy
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@main
         env:
           NODE_ENV: ${{ secrets.NODE_ENV }}
           PORT: ${{ secrets.PORT }}
