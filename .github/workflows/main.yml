@@ -42,7 +42,7 @@ jobs:
             nvm install 22.9.0
             sudo apt-get -y update
             sudo apt-get -y install nginx
-            cd home
+            cd /home
             sudo rm -rf /var/www/*
             sudo mv -f * /var/www
             cd /var/www/
@@ -53,6 +53,7 @@ jobs:
             sudo rm /etc/nginx/sites-available/default
             sudo mv -f default /etc/nginx/sites-available/
             npx prisma migrate deploy
+            pm2 start app.js --name app1 --update-env || pm2 restart all --update-env
             pm2 init simple
             pm2 start
             sudo ufw allow 'Nginx HTTP'
