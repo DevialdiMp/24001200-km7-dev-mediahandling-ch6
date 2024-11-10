@@ -8,7 +8,7 @@ const imageRoutes = require("./routes/imageRoutes")
 app.use(express.json())
 
 app.get("/", (req, res) => {
-    res.send("<h1>Hallo! I am Devialdi Maisa Putra!</h1><p>Welcome to my landing page for Challenge 6 </p>");
+    res.send("<h1>Hallo! I am Devialdi Maisa Putra!</h1><p>Welcome to my landing page for Challenge 6 - Media Handling</p>");
 });
 
 app.use("/user", userRoutes)
