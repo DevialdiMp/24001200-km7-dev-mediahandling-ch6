@@ -13,6 +13,7 @@ jobs:
     steps:
       - name: ngecek repository
         uses: actions/checkout@v2
+
       - name: Deploy to Cloud 1
         uses: easingthemes/ssh-deploy@main
         env:
@@ -53,10 +54,10 @@ jobs:
             sudo rm /etc/nginx/sites-available/default
             sudo mv -f default /etc/nginx/sites-available/
             npx prisma migrate deploy
-            pm2 start app.js --name app1 --update-env || pm2 restart all --update-env
             pm2 init simple
             pm2 start
+            pm2 startup systemd
+            pm2 save
             sudo ufw allow 'Nginx HTTP'
             sudo systemctl start nginx
             sudo systemctl enable nginx
-            pm2 reload all --update-env
