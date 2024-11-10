@@ -12,35 +12,38 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Deploy to Cloud
-        uses: easingthemes/ssh-deploy@v4
+        uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: ${{ secrets.TARGET_DIR }}
-        with:
-          ssh_options: "-o StrictHostKeyChecking=no"  # Menonaktifkan StrictHostKeyChecking
-
 
       - name: Install Node.js 22.9.0 and deploy
-        uses: appleboy/ssh-action@v0.1.2
+        uses: appleboy/ssh-action@master
+        env:
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          PORT: ${{ secrets.PORT }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          IMAGEKIT_PUBLICKEY: ${{ secrets.IMAGEKIT_PUBLICKEY }}
+          IMAGEKIT_PRIVATEKEY: ${{ secrets.IMAGEKIT_PRIVATEKEY }}
+          IMAGEKIT_URL_ENDPOINT: ${{ secrets.IMAGEKIT_URL_ENDPOINT }}
         with:
           host: ${{ secrets.HOST_DNS }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: NODE_ENV, PORT, DATABASE_URL, IMAGEKIT_PUBLICKEY, IMAGEKIT_PRIVATEKEY, IMAGEKIT_URL_ENDPOINT
           script: |
             curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
             export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm install 22.9.0
-            nvm use 22.9.0
-
             sudo apt-get -y update
             sudo apt-get -y install nginx
-            cd /home
+            cd home
             sudo rm -rf /var/www/*
             sudo mv -f * /var/www
             cd /var/www/
@@ -49,12 +52,11 @@ jobs:
             npm ci
             npm i -g pm2
             sudo rm /etc/nginx/sites-available/default
-            sudo mv -f /var/www/default /etc/nginx/sites-available/
+            sudo mv -f default /etc/nginx/sites-available/
             npx prisma migrate deploy
             pm2 init simple
-            pm2 start /var/www/pm2.json
-
+            pm2 start
             sudo ufw allow 'Nginx HTTP'
             sudo systemctl start nginx
             sudo systemctl enable nginx
-            pm2 reload all --update-env
+            pm2 reload all --update-env	
