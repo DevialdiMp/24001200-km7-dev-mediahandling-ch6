@@ -22,7 +22,7 @@ jobs:
           TARGET: ${{ secrets.TARGET_DIR }}
 
       - name: ini untuk menjalankan printah SSH by Remote
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.0
         env:
           NODE_ENV: ${{ secrets.NODE_ENV }}
           PORT: ${{ secrets.PORT }}
