@@ -1,0 +1,60 @@
+name: Push to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Push to AWS on main branch push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ngecek repository
+        uses: actions/checkout@v2
+      - name: Deploy to Cloud 1
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_DNS }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          TARGET: ${{ secrets.TARGET_DIR }}
+
+      - name: ini untuk menjalankan printah SSH by Remote
+        uses: appleboy/ssh-action@master
+        env:
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          PORT: ${{ secrets.PORT }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          IMAGEKIT_PUBLICKEY: ${{ secrets.IMAGEKIT_PUBLICKEY }}
+          IMAGEKIT_PRIVATEKEY: ${{ secrets.IMAGEKIT_PRIVATEKEY }}
+          IMAGEKIT_URL_ENDPOINT: ${{ secrets.IMAGEKIT_URL_ENDPOINT }}
+        with:
+          host: ${{ secrets.HOST_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: NODE_ENV, PORT, DATABASE_URL, IMAGEKIT_PUBLICKEY, IMAGEKIT_PRIVATEKEY, IMAGEKIT_URL_ENDPOINT
+          script: |
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+            export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22.9.0
+            sudo apt-get -y update
+            sudo apt-get -y install nginx
+            cd home
+            sudo rm -rf /var/www/*
+            sudo mv -f * /var/www
+            cd /var/www/
+            sudo chown -R root:ubuntu /var/www
+            sudo chmod -R 775 /var/www
+            npm ci
+            npm i -g pm2
+            sudo rm /etc/nginx/sites-available/default
+            sudo mv -f default /etc/nginx/sites-available/
+            npx prisma migrate deploy
+            pm2 init simple
+            pm2 start
+            sudo ufw allow 'Nginx HTTP'
+            sudo systemctl start nginx
+            sudo systemctl enable nginx
